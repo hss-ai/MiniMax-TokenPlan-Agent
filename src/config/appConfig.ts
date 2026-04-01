@@ -17,6 +17,7 @@ type AppConfig = {
     videoOptions: string[];
     imageDefault: string;
     imageOptions: string[];
+    imageAspectRatios: string[];
     musicDefault: string;
     musicOptions: string[];
     tokenPlanStatusModels: string[];
@@ -60,10 +61,11 @@ const defaultConfig: AppConfig = {
       { id: "male-qn-qingse", label: "青年男声" },
       { id: "female-shaonv", label: "少女音" }
     ],
-    videoDefault: "Hailuo-2.3-Fast-768P 6s",
-    videoOptions: ["Hailuo-2.3-Fast-768P 6s", "Hailuo-2.3-768P 6s"],
+    videoDefault: "MiniMax-Hailuo-2.3",
+    videoOptions: ["MiniMax-Hailuo-02", "MiniMax-Hailuo-2.3", "MiniMax-Hailuo-2.3-Fast"],
     imageDefault: "image-01",
-    imageOptions: ["1:1", "16:9", "9:16", "4:3", "3:4"],
+    imageOptions: ["image-01"],
+    imageAspectRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
     musicDefault: "music-2.5",
     musicOptions: ["music-2.5"],
     tokenPlanStatusModels: ["MiniMax-M2.7-highspeed"]
@@ -84,12 +86,21 @@ const defaultConfig: AppConfig = {
 };
 
 const normalizeConfig = (config: AppConfig): AppConfig => {
+  const isAspectRatio = (value: string) => /^\d+:\d+$/.test(value.trim());
   const safeUrl = typeof config.apiBaseUrl === "string" && config.apiBaseUrl.trim().length > 0
     ? config.apiBaseUrl
     : defaultConfig.apiBaseUrl;
   const safeVoiceOptions = config.models.voiceOptions?.length ? config.models.voiceOptions : defaultConfig.models.voiceOptions;
   const safeVideoOptions = config.models.videoOptions?.length ? config.models.videoOptions : defaultConfig.models.videoOptions;
-  const safeImageOptions = config.models.imageOptions?.length ? config.models.imageOptions : defaultConfig.models.imageOptions;
+  const rawImageOptions = config.models.imageOptions?.length ? config.models.imageOptions : defaultConfig.models.imageOptions;
+  const inferredImageAspectRatios = rawImageOptions.filter(isAspectRatio);
+  const normalizedImageOptions = rawImageOptions.filter((item) => !isAspectRatio(item));
+  const safeImageOptions = normalizedImageOptions.length ? normalizedImageOptions : defaultConfig.models.imageOptions;
+  const safeImageAspectRatios = config.models.imageAspectRatios?.length
+    ? config.models.imageAspectRatios
+    : inferredImageAspectRatios.length
+      ? inferredImageAspectRatios
+      : defaultConfig.models.imageAspectRatios;
   const safeMusicOptions = config.models.musicOptions?.length ? config.models.musicOptions : defaultConfig.models.musicOptions;
   const safeChatOptions = config.models.chatOptions?.length ? config.models.chatOptions : defaultConfig.models.chatOptions;
   const safeTokenPlanStatusModels = (config.models.tokenPlanStatusModels ?? [])
@@ -110,6 +121,7 @@ const normalizeConfig = (config: AppConfig): AppConfig => {
       voiceOptions: safeVoiceOptions,
       videoOptions: safeVideoOptions,
       imageOptions: safeImageOptions,
+      imageAspectRatios: safeImageAspectRatios,
       musicOptions: safeMusicOptions,
       tokenPlanStatusModels: safeTokenPlanStatusModels.length > 0 ? safeTokenPlanStatusModels : [safeChatOptions[0]]
     }
@@ -128,6 +140,7 @@ const mergedConfig: AppConfig = {
     voiceOptions: typedUserConfig.models?.voiceOptions?.length ? typedUserConfig.models.voiceOptions : defaultConfig.models.voiceOptions,
     videoOptions: typedUserConfig.models?.videoOptions?.length ? typedUserConfig.models.videoOptions : defaultConfig.models.videoOptions,
     imageOptions: typedUserConfig.models?.imageOptions?.length ? typedUserConfig.models.imageOptions : defaultConfig.models.imageOptions,
+    imageAspectRatios: typedUserConfig.models?.imageAspectRatios?.length ? typedUserConfig.models.imageAspectRatios : defaultConfig.models.imageAspectRatios,
     musicOptions: typedUserConfig.models?.musicOptions?.length ? typedUserConfig.models.musicOptions : defaultConfig.models.musicOptions,
     tokenPlanStatusModels: typedUserConfig.models?.tokenPlanStatusModels?.length ? typedUserConfig.models.tokenPlanStatusModels : defaultConfig.models.tokenPlanStatusModels
   },

@@ -13,10 +13,12 @@
       { "id": "male-qn-qingse", "label": "青年男声" },
       { "id": "female-shaonv", "label": "少女音" }
     ],
-    "videoDefault": "Hailuo-2.3-Fast-768P 6s",
-    "videoOptions": ["Hailuo-2.3-Fast-768P 6s", "Hailuo-2.3-768P 6s"],
+
+    "videoDefault": "MiniMax-Hailuo-2.3",
+    "videoOptions": ["MiniMax-Hailuo-02", "MiniMax-Hailuo-2.3", "MiniMax-Hailuo-2.3-Fast"],
     "imageDefault": "image-01",
-    "imageOptions": ["1:1", "16:9", "9:16", "4:3", "3:4"],
+    "imageOptions": ["image-01"],
+    "imageAspectRatios": ["1:1", "16:9", "9:16", "4:3", "3:4"],
     "musicDefault": "music-2.5",
     "musicOptions": ["music-2.5"],
     "tokenPlanStatusModels": ["MiniMax-M2.7-highspeed"]

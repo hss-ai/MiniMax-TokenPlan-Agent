@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import NextImage from "next/image";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useTasksStore } from "@/store/useTasksStore";
 import { appConfig } from "@/config/appConfig";
@@ -8,16 +9,21 @@ import { ImageIcon, Loader2, PlayCircle, Clock, AlertCircle, CheckCircle2, Chevr
 import { v4 as uuidv4 } from "uuid";
 import { ApiError, apiRequest } from "@/lib/apiClient";
 
+type ImageGenerateMode = "text_to_image" | "subject_reference";
+
 export default function ImagePage() {
   const { apiKey } = useSettingsStore();
   const { tasks, addTask, updateTask } = useTasksStore();
 
   const [prompt, setPrompt] = useState("");
-  const [aspectRatio, setAspectRatio] = useState(appConfig.models.imageOptions.includes("16:9") ? "16:9" : appConfig.models.imageOptions[0]);
+  const [mode, setMode] = useState<ImageGenerateMode>("text_to_image");
+  const [model, setModel] = useState(appConfig.models.imageDefault);
+  const [aspectRatio, setAspectRatio] = useState(
+    appConfig.models.imageAspectRatios.includes("16:9") ? "16:9" : appConfig.models.imageAspectRatios[0]
+  );
+  const [referenceImageUrl, setReferenceImageUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
-  // 展开状态管理
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
 
   const toggleTask = (id: string) => {
@@ -28,14 +34,14 @@ export default function ImagePage() {
 
   const handleGenerate = async () => {
     if (!prompt.trim() || !apiKey) return;
+    if (mode === "subject_reference" && !referenceImageUrl.trim()) {
+      setErrorMsg("请填写主体参考图片 URL");
+      return;
+    }
 
     setIsSubmitting(true);
     setErrorMsg("");
-
-    // 生成一个本地任务 ID 用于追踪
     const localTaskId = uuidv4();
-
-    // 立即添加一个状态为 Processing 的任务到列表
     addTask({
       id: localTaskId,
       type: 'image',
@@ -43,21 +49,39 @@ export default function ImagePage() {
       status: 'Processing',
       createdAt: Date.now()
     });
-
-    // 默认展开新任务
     setExpandedTasks(prev => ({ ...prev, [localTaskId]: true }));
 
     try {
+      const body: {
+        model: string;
+        prompt: string;
+        aspect_ratio: string;
+        response_format: "base64";
+        subject_reference?: Array<{
+          type: "character";
+          image_file: string;
+        }>;
+      } = {
+        model,
+        prompt,
+        aspect_ratio: aspectRatio,
+        response_format: "base64",
+      };
+
+      if (mode === "subject_reference") {
+        body.subject_reference = [
+          {
+            type: "character",
+            image_file: referenceImageUrl.trim(),
+          },
+        ];
+      }
+
       const data = await apiRequest<{ data?: { image_base64?: string[] } }>({
         path: "/image_generation",
         method: "POST",
         apiKey,
-        body: {
-          model: appConfig.models.imageDefault,
-          prompt: prompt,
-          aspect_ratio: aspectRatio,
-          response_format: "base64",
-        },
+        body,
       });
 
       const base64Str = data.data?.image_base64?.[0];
@@ -71,6 +95,9 @@ export default function ImagePage() {
       }
 
       setPrompt("");
+      if (mode === "subject_reference") {
+        setReferenceImageUrl("");
+      }
 
     } catch (error: unknown) {
       const errorMessage = error instanceof ApiError ? error.message : error instanceof Error ? error.message : "未知错误";
@@ -93,7 +120,7 @@ export default function ImagePage() {
             图片生成 (Image-01)
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            基于 MiniMax-image-01 模型，输入文本描述即可生成高质量图片。任务已支持本地保存记录。
+            支持文生图和主体参考图生图，两种模式均支持本地任务记录与结果下载。
           </p>
         </div>
 
@@ -104,6 +131,39 @@ export default function ImagePage() {
         )}
 
         <div className="bg-white/80 dark:bg-zinc-900/80 rounded-2xl p-6 border border-gray-200/80 dark:border-zinc-700 space-y-4 shadow-sm">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              生成模式
+            </label>
+            <select
+              value={mode}
+              onChange={(e) => setMode(e.target.value as ImageGenerateMode)}
+              className="w-full md:w-64 px-4 py-3 bg-white dark:bg-zinc-950 border border-gray-300 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
+              disabled={isSubmitting || !apiKey}
+            >
+              <option value="text_to_image">文生图</option>
+              <option value="subject_reference">主体参考图生图</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              模型选择
+            </label>
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="w-full md:w-64 px-4 py-3 bg-white dark:bg-zinc-950 border border-gray-300 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
+              disabled={isSubmitting || !apiKey}
+            >
+              {appConfig.models.imageOptions.map((imageModel) => (
+                <option key={imageModel} value={imageModel}>
+                  {imageModel}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               图片描述 (Prompt) *
@@ -117,6 +177,22 @@ export default function ImagePage() {
             />
           </div>
 
+          {mode === "subject_reference" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                主体参考图 URL *
+              </label>
+              <input
+                type="url"
+                value={referenceImageUrl}
+                onChange={(e) => setReferenceImageUrl(e.target.value)}
+                placeholder="https://example.com/character.jpg"
+                className="w-full px-4 py-3 bg-white dark:bg-zinc-950 border border-gray-300 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                disabled={isSubmitting || !apiKey}
+              />
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               图片比例
@@ -127,7 +203,7 @@ export default function ImagePage() {
               className="w-full md:w-64 px-4 py-3 bg-white dark:bg-zinc-950 border border-gray-300 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
               disabled={isSubmitting || !apiKey}
             >
-              {appConfig.models.imageOptions.map((ratio) => (
+              {appConfig.models.imageAspectRatios.map((ratio) => (
                 <option key={ratio} value={ratio}>
                   {ratio}
                 </option>
@@ -197,11 +273,13 @@ export default function ImagePage() {
 
                         {task.status === 'Success' && task.resultUrl && (
                           <div className="mt-2 w-full max-w-xl rounded-lg overflow-hidden bg-black/5 flex items-center justify-center relative group">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
+                            <NextImage
                               src={task.resultUrl}
                               alt="Generated"
+                              width={1280}
+                              height={720}
                               className="w-full h-auto max-h-[600px] object-contain"
+                              unoptimized
                             />
                             <a
                               href={task.resultUrl}
