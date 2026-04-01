@@ -2,31 +2,73 @@
   "name": "minimax-tokenplan-agent",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.mjs",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:web": "next build",
     "start": "next start",
+    "desktop:dev": "concurrently -k \"npm run dev\" \"wait-on http://localhost:3000 && cross-env ELECTRON_DEV=1 electron .\"",
+    "desktop:start": "npm run build:web && electron .",
+    "desktop:dist": "npm run build:web && electron-builder --win --mac",
+    "mobile:sync": "npm run build:web && cap sync",
+    "mobile:android": "npm run build:web && cap run android",
+    "mobile:ios": "npm run build:web && cap run ios",
+    "mobile:open:android": "cap open android",
+    "mobile:open:ios": "cap open ios",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/ios": "^7.4.4",
     "lucide-react": "^1.7.0",
     "next": "16.2.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "serve-handler": "^6.1.6",
     "uuid": "^13.0.0",
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.4.4",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
     "babel-plugin-react-compiler": "1.0.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^37.5.0",
+    "electron-builder": "^26.0.12",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "tailwindcss": "^4",
+    "wait-on": "^9.0.1",
     "typescript": "^5"
+  },
+  "build": {
+    "appId": "com.minimax.tokenplan.agent",
+    "productName": "MiniMax Token Plan Agent",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "out/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ]
+    }
   }
 }
