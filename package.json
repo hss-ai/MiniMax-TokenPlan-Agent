@@ -1,6 +1,8 @@
 {
   "name": "minimax-tokenplan-agent",
   "version": "0.1.0",
+  "description": "MiniMax Token Plan Agent - 多模态AI客户端",
+  "author": "MiniMax Team",
   "private": true,
   "main": "electron/main.mjs",
   "scripts": {
@@ -11,7 +13,7 @@
     "desktop:dev": "concurrently -k \"npm run dev\" \"wait-on http://localhost:3000 && cross-env ELECTRON_DEV=1 electron .\"",
     "desktop:start": "npm run build:web && electron .",
     "desktop:dist": "npm run build:web && electron-builder --win --mac --publish never",
-    "desktop:dist:win": "npm run build:web && electron-builder --win nsis --publish never",
+    "desktop:dist:win": "npm run build:web && electron-builder --win nsis portable --publish never",
     "desktop:dist:mac": "npm run build:web && electron-builder --mac dmg --publish never",
     "mobile:sync": "npm run build:web && cap sync",
     "mobile:android": "npm run build:web && cap run android",
@@ -68,8 +70,15 @@
     ],
     "win": {
       "target": [
-        "nsis"
+        "nsis",
+        "portable"
       ]
+    },
+    "nsis": {
+      "artifactName": "${productName}-${version}-setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
     },
     "mac": {
       "target": [

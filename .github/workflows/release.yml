@@ -25,7 +25,12 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows-installer
-          path: release/*.exe
+          path: release/*-setup.exe
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-portable
+          path: release/*-portable.exe
           if-no-files-found: error
 
   desktop-mac:
@@ -105,6 +110,7 @@ jobs:
         with:
           files: |
             release-assets/windows-installer/*
+            release-assets/windows-portable/*
             release-assets/macos-installer/*
             release-assets/android-apk/*
             release-assets/ios-simulator-app/*

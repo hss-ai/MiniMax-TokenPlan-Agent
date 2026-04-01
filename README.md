@@ -117,7 +117,7 @@ npm run desktop:dist:mac
 
 输出安装包到 `release/` 目录：
 
-- Windows：NSIS 安装包
+- Windows：NSIS 安装包 + Portable 绿色版（免安装）
 - macOS：DMG 安装包
 
 #### 2) 移动端（Android / iOS）
@@ -158,6 +158,7 @@ npm run mobile:open:ios
 当推送 `v*` Tag 时，自动执行：
 
 - Windows：构建 Electron NSIS 安装包（`.exe`）
+- Windows：构建 Electron Portable 绿色版（`.exe`）
 - macOS：构建 Electron DMG（`.dmg`）
 - Android：构建 Debug APK（`.apk`）
 - iOS：构建 Simulator App 压缩包（`App-simulator.zip`，非签名 IPA）
@@ -277,7 +278,7 @@ npm run desktop:dist:mac
 
 Build outputs are generated in `release/`:
 
-- Windows: NSIS installer
+- Windows: NSIS installer + portable build (no installation)
 - macOS: DMG installer
 
 #### Mobile (Android / iOS)
@@ -318,6 +319,7 @@ The repository includes `.github/workflows/release.yml`.
 When you push a `v*` tag, the pipeline automatically:
 
 - Builds Windows NSIS installer (`.exe`)
+- Builds Windows portable app (`.exe`)
 - Builds macOS DMG (`.dmg`)
 - Builds Android debug APK (`.apk`)
 - Builds iOS simulator app archive (`App-simulator.zip`, not a signed IPA)
