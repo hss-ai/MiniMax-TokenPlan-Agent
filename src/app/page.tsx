@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useChatStore } from "@/store/useChatStore";
 import { appConfig } from "@/config/appConfig";
-import { Send, Bot, User, PlusCircle, MessageSquare, Trash2 } from "lucide-react";
+import { Send, Bot, User, PlusCircle, MessageSquare, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { apiRequest, ApiError } from "@/lib/apiClient";
 import PromptQuickAccess from "@/components/PromptQuickAccess";
 
@@ -23,6 +23,7 @@ export default function ChatPage() {
 
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionListCollapsed, setSessionListCollapsed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -78,14 +79,24 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-full rounded-3xl border border-white/70 dark:border-zinc-800 bg-white/65 dark:bg-zinc-900/55 backdrop-blur-xl shadow-xl overflow-hidden">
-      <div className="w-72 border-r border-white/80 dark:border-zinc-800 bg-white/60 dark:bg-zinc-900/40 flex flex-col">
-        <div className="p-4 border-b border-white/70 dark:border-zinc-800">
+      <div className={`border-r border-white/80 dark:border-zinc-800 bg-white/60 dark:bg-zinc-900/40 flex flex-col transition-all ${sessionListCollapsed ? "w-20" : "w-72"}`}>
+        <div className="p-4 border-b border-white/70 dark:border-zinc-800 space-y-2">
+          <div className={`flex ${sessionListCollapsed ? "justify-center" : "justify-end"}`}>
+            <button
+              type="button"
+              onClick={() => setSessionListCollapsed((v) => !v)}
+              className="h-8 w-8 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-900/80 hover:bg-slate-100 dark:hover:bg-zinc-800 flex items-center justify-center"
+            >
+              {sessionListCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            </button>
+          </div>
           <button
             onClick={() => createSession()}
-            className="flex items-center gap-2 w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all justify-center font-medium shadow-sm"
+            className={`flex items-center w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all justify-center font-medium shadow-sm ${sessionListCollapsed ? "" : "gap-2"}`}
+            title="新建对话"
           >
             <PlusCircle className="w-5 h-5" />
-            新建对话
+            {!sessionListCollapsed && "新建对话"}
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -93,25 +104,28 @@ export default function ChatPage() {
             <div
               key={session.id}
               onClick={() => setActiveSession(session.id)}
-            className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all group border ${
+            className={`flex items-center p-3 rounded-xl cursor-pointer transition-all group border ${sessionListCollapsed ? "justify-center" : "justify-between"} ${
                 activeSessionId === session.id
                   ? "bg-gradient-to-r from-blue-500/20 to-indigo-500/20 dark:from-blue-500/25 dark:to-indigo-500/20 text-blue-700 dark:text-blue-300 border-blue-200/80 dark:border-blue-700/50"
                   : "hover:bg-white dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 border-transparent"
               }`}
+              title={sessionListCollapsed ? session.title : undefined}
             >
-              <div className="flex items-center gap-3 overflow-hidden">
+              <div className={`flex items-center overflow-hidden ${sessionListCollapsed ? "" : "gap-3"}`}>
                 <MessageSquare className="w-4 h-4 shrink-0" />
-                <span className="text-sm truncate">{session.title}</span>
+                {!sessionListCollapsed && <span className="text-sm truncate">{session.title}</span>}
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteSession(session.id);
-                }}
-                className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              {!sessionListCollapsed && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteSession(session.id);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
             </div>
           ))}
         </div>

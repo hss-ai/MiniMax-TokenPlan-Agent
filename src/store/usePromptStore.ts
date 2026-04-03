@@ -6,13 +6,15 @@ export type PromptScope = "chat" | "voice" | "video" | "image" | "music";
 export type PromptItem = {
   id: string;
   scope: PromptScope;
-  text: string;
+  theme: string;
+  detail: string;
+  text?: string;
   createdAt: number;
 };
 
 interface PromptState {
   prompts: PromptItem[];
-  addPrompt: (scope: PromptScope, text: string) => void;
+  addPrompt: (scope: PromptScope, detail: string, theme?: string) => void;
   removePrompt: (id: string) => void;
 }
 
@@ -22,19 +24,26 @@ export const usePromptStore = create<PromptState>()(
   persist(
     (set) => ({
       prompts: [],
-      addPrompt: (scope, text) =>
+      addPrompt: (scope, detail, theme = "默认主题") =>
         set((state) => {
-          const normalizedText = text.trim();
-          if (!normalizedText) {
+          const normalizedDetail = detail.trim();
+          const normalizedTheme = theme.trim() || "默认主题";
+          if (!normalizedDetail) {
             return state;
           }
           const existed = state.prompts.find(
-            (item) => item.scope === scope && item.text.toLowerCase() === normalizedText.toLowerCase()
+            (item) =>
+              item.scope === scope &&
+              (item.theme || "默认主题").toLowerCase() === normalizedTheme.toLowerCase() &&
+              (item.detail || item.text || "").toLowerCase() === normalizedDetail.toLowerCase()
           );
           if (existed) {
             return state;
           }
-          const withNew = [{ id: crypto.randomUUID(), scope, text: normalizedText, createdAt: Date.now() }, ...state.prompts];
+          const withNew = [
+            { id: crypto.randomUUID(), scope, theme: normalizedTheme, detail: normalizedDetail, createdAt: Date.now() },
+            ...state.prompts,
+          ];
           const scoped = withNew.filter((item) => item.scope === scope).slice(0, MAX_PROMPTS_PER_SCOPE);
           const others = withNew.filter((item) => item.scope !== scope);
           return { prompts: [...scoped, ...others] };

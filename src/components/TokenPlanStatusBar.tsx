@@ -103,38 +103,43 @@ export default function TokenPlanStatusBar() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-gray-200/80 dark:border-zinc-800 bg-white/92 dark:bg-zinc-950/92 backdrop-blur-md px-4 py-2">
-      <div className="font-mono text-xs text-gray-700 dark:text-gray-200 overflow-x-auto whitespace-nowrap">
-        {error ? (
-          <span className="text-red-500">Token Plan 状态异常：{error}</span>
-        ) : (
-          <>
-            {minimaxMRemains.length === 0 ? (
-              <span className="text-gray-500">暂无匹配模型</span>
-            ) : (
-              minimaxMRemains.map((item, index) => {
-                const stats = getUsageStats(item.current_interval_total_count, item.current_interval_usage_count);
-                const bar = buildProgressBar(stats.percent);
-                const color = getUsageColorClass(stats.percent);
-                return (
-                  <span key={item.model_name}>
-                    {index > 0 && <span className="mx-2 text-gray-400">│</span>}
-                    <span className="mr-1">{index === 0 ? item.model_name : `+ ${item.model_name}`}</span>
-                    <span className={color}>{bar}</span>
-                    <span className="ml-1">
-                      {stats.percent}%({stats.available.toLocaleString("zh-CN")}/{stats.total.toLocaleString("zh-CN")})
+      <div className="flex items-center gap-2">
+        <div className="font-mono text-xs text-gray-700 dark:text-gray-200 overflow-x-auto whitespace-nowrap flex-1">
+          {error ? (
+            <span className="text-red-500">Token Plan 状态异常：{error}</span>
+          ) : (
+            <>
+              {minimaxMRemains.length === 0 ? (
+                <span className="text-gray-500">暂无匹配模型</span>
+              ) : (
+                minimaxMRemains.map((item, index) => {
+                  const stats = getUsageStats(item.current_interval_total_count, item.current_interval_usage_count);
+                  const bar = buildProgressBar(stats.percent);
+                  const color = getUsageColorClass(stats.percent);
+                  return (
+                    <span key={item.model_name}>
+                      {index > 0 && <span className="mx-2 text-gray-400">│</span>}
+                      <span className="mr-1">{index === 0 ? item.model_name : `+ ${item.model_name}`}</span>
+                      <span className={color}>{bar}</span>
+                      <span className="ml-1">
+                        {stats.percent}%({stats.available.toLocaleString("zh-CN")}/{stats.total.toLocaleString("zh-CN")})
+                      </span>
                     </span>
-                  </span>
-                );
-              })
-            )}
-            <span className="mx-2 text-gray-400">│</span>
-            <span>⏱ {formatDuration(liveIntervalRemainMs)}</span>
-            <Button variant="outline" size="sm" className="ml-3 h-6" onClick={() => setExpanded((v) => !v)}>
-              {expanded ? "收起" : "详细"}
-            </Button>
-            {loading && <span className="ml-2 text-gray-500">刷新中...</span>}
-          </>
-        )}
+                  );
+                })
+              )}
+              <span className="mx-2 text-gray-400">│</span>
+              <span>⏱ {formatDuration(liveIntervalRemainMs)}</span>
+            </>
+          )}
+        </div>
+        <Button variant="outline" size="sm" className="h-6" onClick={() => void fetchRemains()} disabled={loading}>
+          刷新
+        </Button>
+        <Button variant="outline" size="sm" className="h-6" onClick={() => setExpanded((v) => !v)}>
+          {expanded ? "收起" : "详细"}
+        </Button>
+        {loading && <span className="text-xs text-gray-500">刷新中...</span>}
       </div>
 
       {expanded && !error && snapshot.data.length > 0 && (
