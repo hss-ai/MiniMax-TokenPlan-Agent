@@ -10,10 +10,10 @@ MiniMax Token Plan Agent is a production-oriented multimodal client for MiniMax 
 ## Highlights
 
 - Unified multimodal workspace for chat, voice, video, image, and music workflows
-- Prompt management by module, theme, and detailed prompt entry
+- Prompt asset workflow with theme filtering, preview, replace, append, and in-place editing
 - Skills management with repository registration, skill registration, apply, and unapply actions
 - Collapsible global workspace navigation and collapsible chat session list
-- Enlarged settings center for system preferences, API key management, prompts, and skills
+- Enlarged settings center with workspace summaries, searchable prompt operations, and product-style control panels
 - Token Plan status bar with live countdown, manual refresh, and automatic polling
 - Shared request and polling abstractions for long-running MiniMax tasks
 - Desktop packaging with Electron and mobile shell delivery with Capacitor
@@ -23,6 +23,7 @@ MiniMax Token Plan Agent is a production-oriented multimodal client for MiniMax 
 ### Core Capabilities
 
 - Multi-session text chat with local history
+- Chat workspace with session overview, timestamped messages, and one-click message copy
 - Text-to-speech generation with task polling and playback
 - Video generation with async task tracking
 - Image generation with preview and download
@@ -33,8 +34,9 @@ MiniMax Token Plan Agent is a production-oriented multimodal client for MiniMax 
 
 - Theme mode switching with persistent preference
 - API key persistence controlled by an explicit remember toggle
-- Prompt quick access filtered by theme and detailed prompt content
-- Settings navigation split into System, Prompt Management, and Skills
+- Prompt quick access with explicit replace and append actions instead of implicit overwrite
+- Settings navigation split into System, Prompt Management, and Skills with summary cards and searchable lists
+- Auto-resizing chat input with keyboard hints for send and newline actions
 - Manual refresh in the bottom quota bar for real-time Token Plan inspection
 
 ### Reliability and Architecture

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useChatStore } from "@/store/useChatStore";
 import { appConfig } from "@/config/appConfig";
-import { Send, Bot, User, PlusCircle, MessageSquare, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Send, Bot, User, PlusCircle, MessageSquare, Trash2, ChevronLeft, ChevronRight, Copy, Check } from "lucide-react";
 import { apiRequest, ApiError } from "@/lib/apiClient";
 import PromptQuickAccess from "@/components/PromptQuickAccess";
 
@@ -24,7 +24,9 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionListCollapsed, setSessionListCollapsed] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (sessions.length === 0) {
@@ -36,7 +38,39 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [sessions, activeSessionId, isLoading]);
 
+  useEffect(() => {
+    if (!textareaRef.current) {
+      return;
+    }
+    textareaRef.current.style.height = "0px";
+    textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 192)}px`;
+  }, [input]);
+
   const activeSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
+  const activeMessageCount = activeSession?.messages.length ?? 0;
+  const contextMessageCount = Math.min(activeMessageCount, MAX_CONTEXT_MESSAGES);
+
+  const appendInput = (value: string) => {
+    setInput((prev) => prev.trim() ? `${prev.trim()}\n${value}` : value);
+  };
+
+  const formatTime = (value: number) =>
+    new Intl.DateTimeFormat("zh-CN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(value);
+
+  const handleCopyMessage = async (id: string, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(id);
+      window.setTimeout(() => {
+        setCopiedMessageId((current) => current === id ? "" : current);
+      }, 1200);
+    } catch {
+      setCopiedMessageId("");
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim() || !apiKey || !activeSession) return;
@@ -139,6 +173,24 @@ export default function ChatPage() {
         ) : (
           <>
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="mx-auto flex max-w-3xl flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white/85 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70">
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <div className="text-lg font-semibold text-slate-900 dark:text-zinc-100">{activeSession.title}</div>
+                    <div className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
+                      当前会话共 {activeMessageCount} 条消息，发送时自动携带最近 {contextMessageCount} 条上下文。
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full border border-slate-200 px-3 py-1 text-slate-600 dark:border-zinc-700 dark:text-zinc-300">
+                      模型：{appConfig.models.chatDefault}
+                    </span>
+                    <span className="rounded-full border border-slate-200 px-3 py-1 text-slate-600 dark:border-zinc-700 dark:text-zinc-300">
+                      会话数：{sessions.length}
+                    </span>
+                  </div>
+                </div>
+              </div>
               {activeSession.messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -164,6 +216,20 @@ export default function ChatPage() {
                         : "bg-gray-100 text-gray-900 dark:bg-zinc-800 dark:text-gray-100 rounded-tl-none"
                     }`}
                   >
+                    <div className={`mb-2 flex items-center gap-2 text-[11px] ${msg.role === "user" ? "justify-end text-blue-700/80 dark:text-blue-200/80" : "justify-between text-slate-500 dark:text-zinc-400"}`}>
+                      <span>{msg.role === "user" ? "你" : "MiniMax Assistant"}</span>
+                      <div className="flex items-center gap-2">
+                        <span>{formatTime(msg.createdAt)}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyMessage(msg.id, msg.content)}
+                          className="inline-flex items-center gap-1 transition-colors hover:text-slate-900 dark:hover:text-zinc-100"
+                        >
+                          {copiedMessageId === msg.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          {copiedMessageId === msg.id ? "已复制" : "复制"}
+                        </button>
+                      </div>
+                    </div>
                     <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                   </div>
                 </div>
@@ -187,7 +253,7 @@ export default function ChatPage() {
 
             <div className="p-4 bg-white/70 dark:bg-zinc-900/60 border-t border-white/80 dark:border-zinc-800">
               <div className="max-w-3xl mx-auto relative space-y-2">
-                <PromptQuickAccess scope="chat" value={input} onUsePrompt={setInput} />
+                <PromptQuickAccess scope="chat" value={input} onUsePrompt={setInput} onAppendPrompt={appendInput} />
                 <div className="relative flex items-end gap-2">
                 {!apiKey && (
                   <div className="absolute -top-10 left-0 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-900/50">
@@ -195,6 +261,7 @@ export default function ChatPage() {
                   </div>
                 )}
                 <textarea
+                  ref={textareaRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -215,6 +282,10 @@ export default function ChatPage() {
                 >
                   <Send className="w-5 h-5" />
                 </button>
+                </div>
+                <div className="flex items-center justify-between px-1 text-xs text-slate-500 dark:text-zinc-400">
+                  <span>Enter 发送，Shift + Enter 换行</span>
+                  <span>{input.trim().length} 字符</span>
                 </div>
               </div>
             </div>

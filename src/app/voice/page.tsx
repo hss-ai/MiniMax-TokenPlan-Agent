@@ -139,7 +139,12 @@ export default function VoicePage() {
         )}
 
         <div className="bg-white/80 dark:bg-zinc-900/80 rounded-2xl p-6 border border-gray-200/80 dark:border-zinc-700 space-y-4 shadow-sm">
-          <PromptQuickAccess scope="voice" value={text} onUsePrompt={setText} />
+          <PromptQuickAccess
+            scope="voice"
+            value={text}
+            onUsePrompt={setText}
+            onAppendPrompt={(value) => setText((prev) => prev.trim() ? `${prev.trim()}\n${value}` : value)}
+          />
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               待合成文本 *

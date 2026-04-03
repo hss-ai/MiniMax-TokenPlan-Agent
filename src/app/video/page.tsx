@@ -309,7 +309,12 @@ export default function VideoPage() {
             <CardDescription>选择模式、模型和参数后提交生成任务</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <PromptQuickAccess scope="video" value={prompt} onUsePrompt={setPrompt} />
+            <PromptQuickAccess
+              scope="video"
+              value={prompt}
+              onUsePrompt={setPrompt}
+              onAppendPrompt={(value) => setPrompt((prev) => prev.trim() ? `${prev.trim()}\n${value}` : value)}
+            />
             <div className="space-y-2">
               <Label>生成模式</Label>
               <Select value={mode} onChange={(e) => setMode(e.target.value as VideoGenerateMode)} disabled={isSubmitting || !apiKey}>
