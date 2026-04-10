@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { getStorageConfig } from '@/lib/storageAdapter';
 
 interface SettingsState {
   apiKey: string;
@@ -135,7 +136,7 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'minimax-settings',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => getStorageConfig()),
       partialize: (state) => ({
         apiKey: state.rememberApiKey ? state.apiKey : "",
         rememberApiKey: state.rememberApiKey,

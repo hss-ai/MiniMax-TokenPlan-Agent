@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { getStorageConfig } from '@/lib/storageAdapter';
 
 export type PromptScope = "chat" | "voice" | "video" | "image" | "music";
 
@@ -86,6 +87,7 @@ export const usePromptStore = create<PromptState>()(
     }),
     {
       name: "minimax-prompts",
+      storage: createJSONStorage(() => getStorageConfig()),
     }
   )
 );

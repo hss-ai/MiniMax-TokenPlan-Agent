@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { getStorageConfig } from '@/lib/storageAdapter';
 
 export interface Task {
   id: string;
@@ -45,6 +46,7 @@ export const useTasksStore = create<TasksState>()(
     }),
     {
       name: 'minimax-tasks',
+      storage: createJSONStorage(() => getStorageConfig()),
       partialize: (state) => ({
         tasks: state.tasks.map((task) => ({
           ...task,

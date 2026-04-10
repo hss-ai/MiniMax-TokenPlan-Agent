@@ -1,7 +1,10 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "node:path";
 import http from "node:http";
 import handler from "serve-handler";
+import Store from "electron-store";
+
+const store = new Store();
 
 let staticServer;
 
@@ -31,8 +34,21 @@ async function createWindow() {
     autoHideMenuBar: true,
     webPreferences: {
       contextIsolation: true,
-      sandbox: true,
+      sandbox: false,
+      preload: path.join(app.getAppPath(), "electron", "preload.mjs")
     },
+  });
+
+  ipcMain.handle('electron-store-get', async (event, key) => {
+    return store.get(key);
+  });
+  
+  ipcMain.handle('electron-store-set', async (event, key, val) => {
+    store.set(key, val);
+  });
+  
+  ipcMain.handle('electron-store-delete', async (event, key) => {
+    store.delete(key);
   });
 
   const isDev = process.env.ELECTRON_DEV === "1";

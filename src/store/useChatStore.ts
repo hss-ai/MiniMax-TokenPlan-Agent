@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
+import { getStorageConfig } from '@/lib/storageAdapter';
 
 export interface Message {
   id: string;
@@ -98,6 +99,7 @@ export const useChatStore = create<ChatStoreState>()(
     }),
     {
       name: 'minimax-chat-sessions',
+      storage: createJSONStorage(() => getStorageConfig()),
     }
   )
 );

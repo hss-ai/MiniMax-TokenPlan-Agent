@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { getStorageConfig } from '@/lib/storageAdapter';
 
 export type SkillRepo = {
   id: string;
@@ -100,6 +101,7 @@ export const useSkillsStore = create<SkillsState>()(
     }),
     {
       name: "minimax-skills",
+      storage: createJSONStorage(() => getStorageConfig()),
     }
   )
 );

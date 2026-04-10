@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MessageSquare, Mic, Video, Image as ImageIcon, Music, Settings, ChevronLeft, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import SettingsModal from "./SettingsModal";
 
 const navItems = [
@@ -22,25 +21,25 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className={`flex flex-col h-screen border-r border-[var(--border-soft)] bg-white/90 dark:border-zinc-800 dark:bg-zinc-950/85 backdrop-blur-xl transition-all ${collapsed ? "w-16" : "w-60"}`}>
-        <div className={`p-3 mb-1 ${collapsed ? "space-y-2" : "space-y-3"}`}>
-          <div className={`flex items-center ${collapsed ? "justify-center" : "justify-end"}`}>
+      <aside className={`flex flex-col h-screen border-r border-[var(--border-soft)] bg-white/90 dark:border-zinc-800 dark:bg-zinc-950/85 backdrop-blur-xl transition-all ${collapsed ? "w-16" : "w-52"}`}>
+        <div className={`p-4 mb-2 ${collapsed ? "space-y-2" : "space-y-3"}`}>
+          <div className={`flex items-center ${collapsed ? "justify-center" : "justify-between"}`}>
+            {!collapsed && (
+              <div className="font-display text-lg font-semibold text-slate-800 dark:text-zinc-100 tracking-tight">
+                MiniMax
+              </div>
+            )}
             <button
               type="button"
               onClick={() => setCollapsed((v) => !v)}
-              className="h-8 w-8 rounded-full border border-[var(--border)] bg-white text-[#45515e] hover:bg-black/[0.03] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 flex items-center justify-center"
+              className="h-8 w-8 rounded-full border border-[var(--border)] bg-white text-[#45515e] hover:bg-black/[0.03] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 flex items-center justify-center transition-colors"
             >
               {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </button>
           </div>
-          {!collapsed && (
-            <div className="flex justify-start -mt-1">
-              <Badge className="px-3 py-1.5 text-base tracking-wide">MiniMax多模态工作台</Badge>
-            </div>
-          )}
         </div>
 
-        <div className="flex-1 px-2.5 py-2 space-y-1.5">
+        <div className="flex-1 px-3 py-2 space-y-1.5">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -64,13 +63,13 @@ export default function Sidebar() {
 
       </aside>
 
-      <div className={`fixed bottom-20 z-20 transition-all ${collapsed ? "left-1.5 w-[3.25rem]" : "left-3 w-[13.5rem]"}`}>
+      <div className={`fixed bottom-20 z-20 transition-all ${collapsed ? "left-1.5 w-[3.25rem]" : "left-4 w-[11rem]"}`}>
         <button
           onClick={() => setIsSettingsOpen(true)}
           title="设置"
-          className={`group flex items-center w-full px-3 py-2.5 rounded-full text-[#45515e] bg-white/95 hover:bg-black/[0.03] dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 transition-colors border border-[var(--border)] dark:border-zinc-700 shadow-sm ${collapsed ? "justify-center" : "gap-3"}`}
+          className={`group flex items-center w-full px-3 py-2.5 rounded-2xl text-[#45515e] bg-white/95 hover:bg-black/[0.03] dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors border border-[var(--border)] dark:border-zinc-700 shadow-sm ${collapsed ? "justify-center" : "gap-3"}`}
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition-colors group-hover:bg-blue-100 group-hover:text-blue-700 dark:bg-zinc-800 dark:text-zinc-300 dark:group-hover:bg-blue-900/40 dark:group-hover:text-blue-300">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors group-hover:bg-blue-100 group-hover:text-blue-700 dark:bg-zinc-800 dark:text-zinc-300 dark:group-hover:bg-blue-900/40 dark:group-hover:text-blue-300">
             <Settings className="h-4 w-4" />
           </span>
           {!collapsed && <span className="text-sm font-medium">设置</span>}

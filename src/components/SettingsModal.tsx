@@ -211,14 +211,14 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[90vh] w-[min(96vw,78rem)] max-w-6xl overflow-hidden p-0">
-        <DialogHeader className="border-b border-[var(--border)] px-8 py-6 dark:border-zinc-800">
+      <DialogContent className="flex flex-col max-h-[90vh] w-[min(96vw,78rem)] max-w-6xl overflow-hidden p-0">
+        <DialogHeader className="shrink-0 border-b border-[var(--border)] px-8 py-6 dark:border-zinc-800">
           <DialogTitle className="text-2xl">设置</DialogTitle>
           <DialogDescription>围绕系统配置、提示词资产与 Skills 能力，提供更完整的工作台级管理体验。</DialogDescription>
         </DialogHeader>
 
-        <div className="grid max-h-[calc(90vh-9rem)] grid-cols-1 gap-5 overflow-hidden px-8 py-6 md:grid-cols-[240px_1fr]">
-          <div className="space-y-3">
+        <div className="flex-1 grid grid-cols-1 gap-5 overflow-hidden px-8 py-6 md:grid-cols-[240px_1fr]">
+          <div className="space-y-3 overflow-y-auto pr-1">
             <div className="rounded-2xl border border-[var(--border)] p-3 dark:border-zinc-800">
               <div className="mb-3 px-1">
                 <div className="text-sm font-semibold text-slate-900 dark:text-zinc-100">设置中心</div>
