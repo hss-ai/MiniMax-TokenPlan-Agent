@@ -78,7 +78,7 @@ export default function ImagePage() {
         ];
       }
 
-      const data = await apiRequest<{ data?: { image_base64?: string[] } }>({
+      const data = await apiRequest<{ base64_data?: string[] }>({
         path: "/image_generation",
         method: "POST",
         apiKey,
@@ -86,7 +86,7 @@ export default function ImagePage() {
         body,
       });
 
-      const base64Str = data.data?.image_base64?.[0];
+      const base64Str = data.base64_data?.[0];
       if (base64Str) {
         updateTask(localTaskId, {
           status: 'Success',

@@ -15,6 +15,9 @@ export default function VoicePage() {
 
   const [text, setText] = useState("");
   const [voiceId, setVoiceId] = useState(appConfig.models.voiceDefault);
+  const [speed, setSpeed] = useState(1);
+  const [vol, setVol] = useState(1);
+  const [pitch, setPitch] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -88,9 +91,9 @@ export default function VoicePage() {
           text: text,
           voice_setting: {
             voice_id: voiceId,
-            speed: 1,
-            vol: 1,
-            pitch: 0
+            speed: speed,
+            vol: vol,
+            pitch: pitch
           },
           audio_setting: {
             sample_rate: appConfig.audio.voice.sampleRate,
@@ -174,6 +177,54 @@ export default function VoicePage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#18181b] dark:text-gray-300 mb-2">
+                语速 (Speed): {speed.toFixed(1)}
+              </label>
+              <input
+                type="range"
+                min="0.5"
+                max="2.0"
+                step="0.1"
+                value={speed}
+                onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                className="w-full"
+                disabled={isSubmitting || !apiKey}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#18181b] dark:text-gray-300 mb-2">
+                音量 (Volume): {vol.toFixed(1)}
+              </label>
+              <input
+                type="range"
+                min="0.1"
+                max="2.0"
+                step="0.1"
+                value={vol}
+                onChange={(e) => setVol(parseFloat(e.target.value))}
+                className="w-full"
+                disabled={isSubmitting || !apiKey}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#18181b] dark:text-gray-300 mb-2">
+                语调 (Pitch): {pitch}
+              </label>
+              <input
+                type="range"
+                min="-10"
+                max="10"
+                step="1"
+                value={pitch}
+                onChange={(e) => setPitch(parseInt(e.target.value))}
+                className="w-full"
+                disabled={isSubmitting || !apiKey}
+              />
+            </div>
           </div>
 
           <div className="mt-4 flex items-center justify-between">

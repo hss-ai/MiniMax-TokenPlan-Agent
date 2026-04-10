@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useChatStore } from "@/store/useChatStore";
 import { appConfig } from "@/config/appConfig";
-import { Send, Bot, User, PlusCircle, MessageSquare, Trash2, ChevronLeft, ChevronRight, Copy, Check } from "lucide-react";
+import { Send, Bot, User, PlusCircle, MessageSquare, Trash2, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Copy, Check } from "lucide-react";
 import { apiRequest, ApiError } from "@/lib/apiClient";
 import PromptQuickAccess from "@/components/PromptQuickAccess";
 
@@ -24,6 +24,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionListCollapsed, setSessionListCollapsed] = useState(false);
+  const [toolsExpanded, setToolsExpanded] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState("");
   const [mcpEnabled, setMcpEnabled] = useState(false);
   const [selectedMcpServerIds, setSelectedMcpServerIds] = useState<string[]>([]);
@@ -300,44 +301,48 @@ export default function ChatPage() {
 
             <div className="p-4 pb-6 bg-white/75 dark:bg-zinc-900/60 border-t border-[var(--border-soft)] dark:border-zinc-800">
               <div className="max-w-3xl mx-auto relative space-y-2">
-                <PromptQuickAccess scope="chat" value={input} onUsePrompt={setInput} onAppendPrompt={appendInput} />
-                <div className="rounded-2xl border border-[var(--border)] bg-white/95 px-3 py-2 text-xs dark:border-zinc-700 dark:bg-zinc-900/70">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setMcpEnabled((value) => !value)}
-                      disabled={enabledMcpServers.length === 0}
-                      className={`rounded-full border px-2.5 py-1 transition-colors ${
-                        mcpEnabled
-                          ? "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                          : "border-[var(--border)] bg-white text-[#45515e] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
-                      } disabled:cursor-not-allowed disabled:opacity-50`}
-                    >
-                      {mcpEnabled ? "MCP 已启用" : "MCP 已关闭"}
-                    </button>
-                    {enabledMcpServers.length === 0 ? (
-                      <span className="text-slate-500 dark:text-zinc-400">请先在设置中心的 MCP 管理里添加并启用服务</span>
-                    ) : (
-                      enabledMcpServers.map((server) => (
+                {toolsExpanded && (
+                  <>
+                    <PromptQuickAccess scope="chat" value={input} onUsePrompt={setInput} onAppendPrompt={appendInput} />
+                    <div className="rounded-2xl border border-[var(--border)] bg-white/95 px-3 py-2 text-xs dark:border-zinc-700 dark:bg-zinc-900/70">
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
-                          key={server.id}
                           type="button"
-                          onClick={() => toggleMcpServer(server.id)}
+                          onClick={() => setMcpEnabled((value) => !value)}
+                          disabled={enabledMcpServers.length === 0}
                           className={`rounded-full border px-2.5 py-1 transition-colors ${
-                            selectedMcpServerIds.includes(server.id)
-                              ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
+                            mcpEnabled
+                              ? "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
                               : "border-[var(--border)] bg-white text-[#45515e] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
-                          }`}
+                          } disabled:cursor-not-allowed disabled:opacity-50`}
                         >
-                          {server.name}
+                          {mcpEnabled ? "MCP 已启用" : "MCP 已关闭"}
                         </button>
-                      ))
-                    )}
-                  </div>
-                  {mcpEnabled && enabledMcpServers.length > 0 && selectedMcpServers.length === 0 && (
-                    <div className="mt-2 text-amber-600 dark:text-amber-300">请至少选择一个 MCP 服务</div>
-                  )}
-                </div>
+                        {enabledMcpServers.length === 0 ? (
+                          <span className="text-slate-500 dark:text-zinc-400">请先在设置中心的 MCP 管理里添加并启用服务</span>
+                        ) : (
+                          enabledMcpServers.map((server) => (
+                            <button
+                              key={server.id}
+                              type="button"
+                              onClick={() => toggleMcpServer(server.id)}
+                              className={`rounded-full border px-2.5 py-1 transition-colors ${
+                                selectedMcpServerIds.includes(server.id)
+                                  ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
+                                  : "border-[var(--border)] bg-white text-[#45515e] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                              }`}
+                            >
+                              {server.name}
+                            </button>
+                          ))
+                        )}
+                      </div>
+                      {mcpEnabled && enabledMcpServers.length > 0 && selectedMcpServers.length === 0 && (
+                        <div className="mt-2 text-amber-600 dark:text-amber-300">请至少选择一个 MCP 服务</div>
+                      )}
+                    </div>
+                  </>
+                )}
                 <div className="relative flex items-end gap-2">
                 {!apiKey && (
                   <div className="absolute -top-10 left-0 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-900/50">
@@ -368,8 +373,23 @@ export default function ChatPage() {
                 </button>
                 </div>
                 <div className="flex items-center justify-between px-1 pt-1 text-xs text-slate-500 dark:text-zinc-400">
-                  <span>Enter 发送，Shift + Enter 换行</span>
-                  <span>{input.trim().length} 字符</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setToolsExpanded((v) => !v)}
+                      className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-zinc-100 transition-colors"
+                    >
+                      {toolsExpanded ? (
+                        <>收起提示词与MCP栏目 <ChevronUp className="w-3 h-3" /></>
+                      ) : (
+                        <>展开提示词与MCP栏目 <ChevronDown className="w-3 h-3" /></>
+                      )}
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span>Enter 发送，Shift + Enter 换行</span>
+                    <span>{input.trim().length} 字符</span>
+                  </div>
                 </div>
               </div>
             </div>

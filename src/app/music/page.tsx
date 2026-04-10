@@ -15,6 +15,7 @@ export default function MusicPage() {
 
   const [prompt, setPrompt] = useState("");
   const [lyrics, setLyrics] = useState("");
+  const [isInstrumental, setIsInstrumental] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -27,11 +28,12 @@ export default function MusicPage() {
     setErrorMsg("");
 
     const localTaskId = uuidv4();
+    const finalLyrics = isInstrumental ? "\u65e0\u6b4c\u8bcd" : (lyrics.trim() || undefined);
 
     addTask({
       id: localTaskId,
       type: 'music',
-      prompt: `${prompt}${lyrics ? ' (含歌词)' : ' (纯音乐)'}`,
+      prompt: `${prompt}${isInstrumental ? ' (纯音乐)' : (lyrics ? ' (含歌词)' : ' (纯音乐)')}`,
       status: 'Processing',
       createdAt: Date.now()
     });
@@ -45,7 +47,7 @@ export default function MusicPage() {
         body: {
           model: appConfig.models.musicDefault,
           prompt: prompt,
-          lyrics: lyrics.trim() || undefined,
+          lyrics: finalLyrics,
           lyrics_optimizer: false,
           audio_setting: {
             sample_rate: appConfig.audio.music.sampleRate,
@@ -122,15 +124,30 @@ export default function MusicPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#18181b] dark:text-gray-300 mb-2">
-              歌词 (可选)
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-[#18181b] dark:text-gray-300">
+                歌词 (可选)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="instrumental"
+                  checked={isInstrumental}
+                  onChange={(e) => setIsInstrumental(e.target.checked)}
+                  disabled={isSubmitting || !apiKey}
+                  className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                />
+                <label htmlFor="instrumental" className="text-sm text-[#45515e] dark:text-gray-400">
+                  生成纯音乐 (无歌词)
+                </label>
+              </div>
+            </div>
             <textarea
               value={lyrics}
               onChange={(e) => setLyrics(e.target.value)}
-              placeholder="输入你的歌词。由于权限限制，已关闭自动作词功能，如果不填则生成纯音乐。"
-              className="w-full h-48 px-4 py-3 bg-white dark:bg-zinc-950 border border-[var(--border)] dark:border-zinc-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-300/70 resize-none dark:text-white"
-              disabled={isSubmitting || !apiKey}
+              placeholder="输入你的歌词。如果不填或勾选“纯音乐”，则生成纯音乐。"
+              className="w-full h-48 px-4 py-3 bg-white dark:bg-zinc-950 border border-[var(--border)] dark:border-zinc-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-300/70 resize-none dark:text-white disabled:opacity-50"
+              disabled={isSubmitting || !apiKey || isInstrumental}
             />
           </div>
 
