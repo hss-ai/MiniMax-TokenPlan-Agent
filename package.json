@@ -69,13 +69,13 @@
     "directories": {
       "output": "release"
     },
-    "icon": "assets/icon.ico",
     "files": [
       "electron/**/*",
       "out/**/*",
       "package.json"
     ],
     "win": {
+      "icon": "assets/icon.ico",
       "target": [
         "nsis",
         "portable"
@@ -92,8 +92,7 @@
     "mac": {
       "target": [
         "dmg"
-      ],
-      "icon": "assets/icon.ico"
+      ]
     }
   }
 }

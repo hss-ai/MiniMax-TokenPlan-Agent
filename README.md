@@ -53,6 +53,7 @@ MiniMax Token Plan Agent is a production-oriented multimodal client for MiniMax 
 - Shared polling layer for async job orchestration
 - Strict TypeScript codebase with Zustand-based state management
 - Config merge strategy using default config plus local override file
+- Platform-specific desktop icon mapping (Windows uses `.ico`; macOS uses native icon assets) to avoid cross-platform packaging failures
 
 ## Tech Stack
 
