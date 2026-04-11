@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { PromptScope, usePromptStore } from "@/store/usePromptStore";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type PromptQuickAccessProps = {
   scope: PromptScope;
@@ -121,8 +123,12 @@ export default function PromptQuickAccess({ scope, value, onUsePrompt, onAppendP
         </div>
       </div>
       {selectedPromptText && (
-        <div className="rounded-2xl border border-dashed border-[var(--border)] bg-white/95 px-3 py-2 text-sm leading-6 text-[#45515e] dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-300">
-          {selectedPromptText}
+        <div className="rounded-2xl border border-dashed border-[var(--border)] bg-white/95 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-950/60">
+          <div className="max-h-48 overflow-y-auto rounded-xl bg-[var(--surface-muted)]/60 p-3 text-sm text-[#45515e] dark:bg-zinc-900/60 dark:text-zinc-300">
+            <div className="[&_h1]:mb-2 [&_h1]:text-base [&_h1]:font-semibold [&_h2]:mb-2 [&_h2]:text-sm [&_h2]:font-semibold [&_h3]:mb-1 [&_h3]:text-sm [&_h3]:font-medium [&_li]:ml-4 [&_li]:list-disc [&_ol]:ml-4 [&_ol]:list-decimal [&_p]:whitespace-pre-wrap [&_pre]:overflow-x-auto [&_pre]:rounded [&_pre]:bg-black/5 [&_pre]:p-2 [&_ul]:ml-4 [&_ul]:list-disc">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{selectedPromptText}</ReactMarkdown>
+            </div>
+          </div>
         </div>
       )}
       {scopedPrompts.length === 0 && (

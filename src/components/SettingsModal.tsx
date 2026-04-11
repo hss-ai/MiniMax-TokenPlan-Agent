@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -369,7 +371,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                 <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
                   <div>
                     <div className="text-base font-medium">按模块管理主题与详细提示词</div>
-                    <div className="mt-1 text-sm text-slate-500 dark:text-zinc-400">支持筛选、编辑与复用，适合沉淀团队常用表达模板。</div>
+                    <div className="mt-1 text-sm text-slate-500 dark:text-zinc-400">支持筛选、编辑、Markdown 渲染与复用，适合沉淀长提示词模板。</div>
                   </div>
                   <Input
                     value={promptSearch}
@@ -402,16 +404,17 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                     <div className="mt-1 text-sm font-medium text-slate-900 dark:text-zinc-100">{filteredPrompts.length}</div>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                   <Input
                     value={promptTheme}
                     onChange={(e) => setPromptTheme(e.currentTarget.value)}
                     placeholder="主题，例如：电商文案"
                   />
-                  <Input
+                  <textarea
                     value={promptDetail}
                     onChange={(e) => setPromptDetail(e.currentTarget.value)}
-                    placeholder="详细提示词"
+                    placeholder="详细提示词（支持 Markdown，可粘贴长内容）"
+                    className="min-h-40 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
                   />
                 </div>
                 <div className="flex justify-end">
@@ -443,7 +446,12 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                           {isEditing ? (
                             <div className="space-y-3">
                               <Input value={editingPromptTheme} onChange={(e) => setEditingPromptTheme(e.currentTarget.value)} placeholder="主题" />
-                              <Input value={editingPromptDetail} onChange={(e) => setEditingPromptDetail(e.currentTarget.value)} placeholder="详细提示词" />
+                              <textarea
+                                value={editingPromptDetail}
+                                onChange={(e) => setEditingPromptDetail(e.currentTarget.value)}
+                                placeholder="详细提示词（支持 Markdown）"
+                                className="min-h-40 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                              />
                               <div className="flex justify-end gap-2">
                                 <Button type="button" variant="outline" size="sm" onClick={cancelEditPrompt}>
                                   取消
@@ -465,8 +473,10 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="text-xs text-blue-600 dark:text-blue-300 truncate">{item.theme || "默认主题"}</div>
-                                <div className="mt-1 text-xs text-slate-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
-                                  {item.detail || item.text || ""}
+                                <div className="mt-2 max-h-56 overflow-y-auto rounded-lg bg-[var(--surface-muted)]/70 p-3 text-xs text-slate-700 dark:bg-zinc-900/60 dark:text-zinc-300">
+                                  <div className="[&_h1]:mb-2 [&_h1]:text-sm [&_h1]:font-semibold [&_h2]:mb-2 [&_h2]:text-xs [&_h2]:font-semibold [&_h3]:mb-1 [&_h3]:text-xs [&_h3]:font-medium [&_li]:ml-4 [&_li]:list-disc [&_ol]:ml-4 [&_ol]:list-decimal [&_p]:whitespace-pre-wrap [&_pre]:overflow-x-auto [&_pre]:rounded [&_pre]:bg-black/5 [&_pre]:p-2 [&_ul]:ml-4 [&_ul]:list-disc">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.detail || item.text || ""}</ReactMarkdown>
+                                  </div>
                                 </div>
                               </div>
                               <div className="flex shrink-0 gap-2">

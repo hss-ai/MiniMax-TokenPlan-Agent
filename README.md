@@ -11,7 +11,7 @@ MiniMax Token Plan Agent is a production-oriented multimodal client for MiniMax 
 
 - Unified multimodal workspace for chat, voice, video, image, and music workflows
 - Full compatibility with official minimax-multimodal-toolkit skills (including advanced voice parameters, instrumental music generation, etc.)
-- Prompt asset workflow with theme filtering, preview, replace, append, and in-place editing
+- Prompt asset workflow with theme filtering, Markdown preview, replace, append, and in-place editing
 - Skills management with repository registration, skill registration, apply, and unapply actions
 - MCP management with quick add/delete, enable toggle, and JSON import (`mcpServers` schema)
 - Collapsible global workspace navigation and collapsible chat session list
@@ -40,6 +40,7 @@ MiniMax Token Plan Agent is a production-oriented multimodal client for MiniMax 
 - Airtable-inspired enterprise UI design system (Haas typography, deep navy & primary blue palette, multi-layer soft shadows)
 - API key and settings persistence via explicit remember toggle (now securely stored in the system via electron-store on Desktop)
 - Prompt quick access with explicit replace and append actions instead of implicit overwrite
+- Long prompt support in settings: multiline Markdown editing with scrollable rendered preview
 - Settings navigation split into System, Prompt Management, and Skills with summary cards and searchable lists
 - Settings center includes MCP management, supporting manual entry and one-click JSON import
 - Auto-resizing chat input with keyboard hints for send and newline actions
