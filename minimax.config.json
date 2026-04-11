@@ -19,8 +19,8 @@
     "imageDefault": "image-01",
     "imageOptions": ["image-01"],
     "imageAspectRatios": ["1:1", "16:9", "9:16", "4:3", "3:4"],
-    "musicDefault": "music-2.5",
-    "musicOptions": ["music-2.5"],
+    "musicDefault": "music-2.6",
+    "musicOptions": ["music-2.5", "music-2.6"],
     "tokenPlanStatusModels": ["MiniMax-M2.7-highspeed"]
   },
   "audio": {

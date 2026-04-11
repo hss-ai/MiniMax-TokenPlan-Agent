@@ -30,6 +30,7 @@ MiniMax Token Plan Agent is a production-oriented multimodal client for MiniMax 
 - Video generation with async task tracking (supports text/image/start-end/subject-ref modes), smooth local video playback using custom protocols
 - Image generation with preview and download
 - Music generation in instrumental and lyric modes
+- Music model options include `music-2.5` and `music-2.6` (default `music-2.6`)
 - Local prompt reuse across all functional modules
 - Skills management with direct parsing and importing from GitHub repositories
 

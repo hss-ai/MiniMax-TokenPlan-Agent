@@ -89,10 +89,10 @@ export default function MusicPage() {
         <div>
           <h1 className="font-display text-3xl font-medium text-[#18181b] dark:text-white flex items-center gap-3">
             <Music className="w-8 h-8 text-purple-600" />
-            音乐生成 (Music-2.5)
+            {`音乐生成 (${appConfig.models.musicDefault})`}
           </h1>
           <p className="mt-2 text-[#45515e] dark:text-gray-400">
-            基于 MiniMax-Music-2.5 模型，输入风格描述和可选歌词即可生成完整的歌曲。任务已支持本地保存记录。
+            {`基于 MiniMax-${appConfig.models.musicDefault} 模型，输入风格描述和可选歌词即可生成完整的歌曲。任务已支持本地保存记录。`}
           </p>
         </div>
 
